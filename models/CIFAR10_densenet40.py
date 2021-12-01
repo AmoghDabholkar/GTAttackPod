@@ -1,5 +1,5 @@
 from keras.layers import Input, Dense, Activation, Conv2D, AveragePooling2D
-from keras.layers.normalization import BatchNormalization
+from keras.layers import BatchNormalization
 from keras.layers.pooling import GlobalAveragePooling2D
 from keras.layers.merge import concatenate
 from keras.regularizers import l2

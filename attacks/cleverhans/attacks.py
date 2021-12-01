@@ -3,7 +3,7 @@ import numpy as np
 from six.moves import xrange
 import warnings
 from . import utils_tf
-
+from matplotlib import pyplot
 
 class Attack:
     """
@@ -53,7 +53,8 @@ class Attack:
         if not self.inf_loop:
             self.inf_loop = True
             assert self.parse_params(**kwargs)
-            import tensorflow as tf
+            import tensorflow.compat.v1 as tf
+            tf.disable_v2_behavior()
             graph = tf.py_func(self.generate_np, [x], tf.float32)
             self.inf_loop = False
             return graph
@@ -75,10 +76,13 @@ class Attack:
 
         if not self.inf_loop:
             self.inf_loop = True
-            import tensorflow as tf
+            import tensorflow.compat.v1 as tf
+            tf.disable_v2_behavior()
 
             # Generate this attack's graph if not done previously
             if not hasattr(self, "_x") and not hasattr(self, "_x_adv"):
+                import tensorflow.compat.v1 as tf
+                tf.disable_v2_behavior()
                 input_shape = list(x_val.shape)
                 input_shape[0] = None
                 self._x = tf.placeholder(tf.float32, shape=input_shape)
@@ -161,7 +165,8 @@ class FastGradientMethod(Attack):
         if self.back == 'th':
             raise NotImplementedError('Theano version not implemented.')
 
-        import tensorflow as tf
+        import tensorflow.compat.v1 as tf
+        tf.disable_v2_behavior()
 
         # Generate this attack's graph if it hasn't been done previously
         if not hasattr(self, "_x"):
@@ -231,8 +236,9 @@ class BasicIterativeMethod(Attack):
         super(BasicIterativeMethod, self).__init__(model, back, sess)
 
     def generate(self, x, **kwargs):
-        import tensorflow as tf
-
+        import tensorflow.compat.v1 as tf
+        tf.disable_v2_behavior()
+        # from matplotlib import pyplot
         # Parse and save attack-specific parameters
         assert self.parse_params(**kwargs)
 
@@ -241,7 +247,7 @@ class BasicIterativeMethod(Attack):
 
         # Fix labels to the first model predictions for loss computation
         model_preds = self.model(x)
-        preds_max = tf.reduce_max(model_preds, 1, keep_dims=True)
+        preds_max = tf.reduce_max(model_preds, 1, keepdims=True)
         y = tf.to_float(tf.equal(model_preds, preds_max))
         fgsm_params = {'eps': self.eps_iter, 'y': y, 'ord': self.ord, 'defense_models': self.defense_models}
 
@@ -260,7 +266,10 @@ class BasicIterativeMethod(Attack):
                 elif self.ord == 2:
                     norm = tf.sqrt(tf.reduce_sum(tf.square(eta), reduction_indices=reduc_ind, keep_dims=True))
                 eta = eta * self.eps / norm
-
+            # print(eta.shape)
+            # print(type(eta))
+            # pyplot.imshow(eta)
+            # pyplot.imshow(x+eta)
         # Define adversarial example (and clip if necessary)
         adv_x = x + eta
         if self.clip_min is not None and self.clip_max is not None:
@@ -326,7 +335,8 @@ class SaliencyMapMethod(Attack):
         """
         Attack-specific parameters:
         """
-        import tensorflow as tf
+        import tensorflow.compat.v1 as tf
+        tf.disable_v2_behavior()
         from .attacks_tf import jacobian_graph, jsma_batch
 
         # Parse and save attack-specific parameters
@@ -364,7 +374,8 @@ class SaliencyMapMethod(Attack):
         :param batch_size: (optional) Batch size when running the graph
         :param targets: (optional) Target values if the attack is targeted
         """
-        import tensorflow as tf
+        import tensorflow.compat.v1 as tf
+        tf.disable_v2_behavior()
         # Generate this attack's graph if it hasn't been done previously
         if not hasattr(self, "_x"):
             input_shape = list(x_val.shape)

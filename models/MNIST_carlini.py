@@ -30,5 +30,5 @@ def MNIST_carlini(use_softmax=True, rel_path='./'):
     # Load pre-trained weights
     model.load_weights(os.path.join('%smodels/weights' % rel_path, "MNIST_carlini.keras_weights.h5"))
     model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['acc'])
-    model.name = 'MNIST_carlini'
+    # model.name = 'MNIST_carlini'
     return model

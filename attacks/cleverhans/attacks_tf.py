@@ -6,7 +6,8 @@ from __future__ import unicode_literals
 import copy
 import numpy as np
 from six.moves import xrange
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import warnings
 
 from . import utils_tf
